@@ -1,16 +1,53 @@
-# This is a sample Python script.
+import utils.helpers as hlp
+from pandas import read_csv
+import csv
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+file_name = "train.csv"
+out_file_name = "train_transformed.csv"
+
+data = read_csv(file_name)
+
+headers = data.columns.tolist()
+
+# get index of first feature
+first_feature_index = hlp.get_first_feature_index(headers)
+
+result = [hlp.get_result_headers(headers)]
+
+mean_std_list = hlp.get_mean_stg_values_list(data, headers)
+
+with open(file_name, 'r') as file:
+    csvFileReader = csv.reader(file)
+
+    for row in csvFileReader:
+        if len(row[0]) == 0:
+            continue
+
+        std_row = []
+
+        max_val = -999
+        max_val_index = -1
+
+        for index, item in enumerate(row):
+            value = item
+
+            if index >= first_feature_index:
+                feature_index = index - first_feature_index
+                value = (float(item) - mean_std_list[0][feature_index]) / mean_std_list[1][feature_index]
+
+                if value > max_val:
+                    max_val = value
+                    max_val_index = feature_index
+
+            std_row.append(value)
+
+        std_row.append(max_val_index)
+        result.append(std_row)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+file = open(out_file_name, 'w+', newline='')
 
+with file:
+    write = csv.writer(file)
+    write.writerows(result)
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
