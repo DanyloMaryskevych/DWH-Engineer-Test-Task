@@ -1,11 +1,13 @@
 import math
 
+feature_const = "feature_"
+
 
 def get_first_feature_index(headers):
     first_feature = ''
 
     for header in headers:
-        if header.startswith("feature_type"):
+        if header.startswith(feature_const):
             first_feature = header
             break
 
@@ -45,7 +47,6 @@ def get_mean_stg_values_list(data_list, headers):
 
 def get_result_headers(headers):
     result_headers = []
-    feature_const = "feature_"
     type_const = "type_1_"
     stand_const = "stand_"
 
